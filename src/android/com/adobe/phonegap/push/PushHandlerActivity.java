@@ -1,5 +1,7 @@
 package com.adobe.phonegap.push;
 
+import me.pushy.sdk.Pushy;
+
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -30,6 +32,15 @@ public class PushHandlerActivity extends Activity implements PushConstants {
         gcm.setNotification(notId, "");
         super.onCreate(savedInstanceState);
         Log.v(LOG_TAG, "onCreate");
+        Pushy.listen(this);
+
+        // Check whether the user has granted us the READ/WRITE_EXTERNAL_STORAGE permissions
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Request both READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE so that the
+            // Pushy SDK will be able to persist the device's registration ID in the external storage
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        }
+
         String callback = getIntent().getExtras().getString("callback");
         Log.d(LOG_TAG, "callback = " + callback);
         boolean foreground = getIntent().getExtras().getBoolean("foreground", true);

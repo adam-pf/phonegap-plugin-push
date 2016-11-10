@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +24,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmListenerService;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +38,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 @SuppressLint("NewApi")
-public class GCMIntentService extends GcmListenerService implements PushConstants {
+public class GCMIntentService extends BroadcastReceiver implements PushConstants {
 
     private static final String LOG_TAG = "PushPlugin_GCMIntentService";
     private static HashMap<Integer, ArrayList<String>> messageMap = new HashMap<Integer, ArrayList<String>>();
@@ -59,8 +58,10 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
     }
 
     @Override
-    public void onMessageReceived(String from, Bundle extras) {
-        Log.d(LOG_TAG, "onMessage - from: " + from);
+    public void onReceive(String from, Bundle extras) {
+        Log.d(TAG, "onMessage - context: " + context);
+        // Extract the payload from the message
+        Bundle extras = intent.getExtras();
 
         if (extras != null) {
             Context applicationContext = getApplicationContext();

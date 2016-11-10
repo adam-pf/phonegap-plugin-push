@@ -6,8 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.iid.InstanceID;
+import me.pushy.sdk.Pushy;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -59,19 +58,13 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
 
                     Log.v(LOG_TAG, "execute: data=" + data.toString());
                     SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
-                    String senderID = null;
 
                     try {
                         jo = data.getJSONObject(0).getJSONObject(ANDROID);
 
                         Log.v(LOG_TAG, "execute: jo=" + jo.toString());
 
-                        senderID = jo.getString(SENDER_ID);
-
-                        Log.v(LOG_TAG, "execute: senderID=" + senderID);
-
-                        String savedSenderID = sharedPref.getString(SENDER_ID, "");
-                        registration_id = InstanceID.getInstance(getApplicationContext()).getToken(senderID, GCM);
+                        registration_id = Pushy.register(getApplicationContext());
 
                         if (!"".equals(registration_id)) {
                             JSONObject json = new JSONObject().put(REGISTRATION_ID, registration_id);
@@ -143,7 +136,8 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
                         if (topics != null && !"".equals(registration_id)) {
                             unsubscribeFromTopics(topics, registration_id);
                         } else {
-                            InstanceID.getInstance(getApplicationContext()).deleteInstanceID();
+                            //InstanceID.getInstance(getApplicationContext()).deleteInstanceID();
+                            // TODO unregister pushy
                             Log.v(LOG_TAG, "UNREGISTER");
 
                             // Remove shared prefs
@@ -346,7 +340,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
         try {
             if (topic != null) {
                 Log.d(LOG_TAG, "Subscribing to topic: " + topic);
-                GcmPubSub.getInstance(getApplicationContext()).subscribe(registrationToken, getTopicPath(topic), null);
+                //GcmPubSub.getInstance(getApplicationContext()).subscribe(registrationToken, getTopicPath(topic), null);
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to subscribe to topic: " + topic, e);
@@ -362,7 +356,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
                     topic = topics.optString(i, null);
                     if (topic != null) {
                         Log.d(LOG_TAG, "Unsubscribing to topic: " + topic);
-                        GcmPubSub.getInstance(getApplicationContext()).unsubscribe(registrationToken, getTopicPath(topic));
+                        //GcmPubSub.getInstance(getApplicationContext()).unsubscribe(registrationToken, getTopicPath(topic));
                     }
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Failed to unsubscribe to topic: " + topic, e);
@@ -376,7 +370,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
         try {
             if (topic != null) {
                 Log.d(LOG_TAG, "Unsubscribing to topic: " + topic);
-                GcmPubSub.getInstance(getApplicationContext()).unsubscribe(registrationToken, getTopicPath(topic));
+                //GcmPubSub.getInstance(getApplicationContext()).unsubscribe(registrationToken, getTopicPath(topic));
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Failed to unsubscribe to topic: " + topic, e);

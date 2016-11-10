@@ -7,8 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
+import me.pushy.sdk.Pushy;
 
 import java.io.IOException;
 
@@ -24,10 +23,7 @@ public class RegistrationIntentService extends IntentService implements PushCons
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
 
         try {
-            InstanceID instanceID = InstanceID.getInstance(this);
-            String senderID = sharedPreferences.getString(SENDER_ID, "");
-            String token = instanceID.getToken(senderID,
-                    GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            String token = Pushy.register(getApplicationContext());
             PushPlugin.setRegistrationID(token);
             Log.i(LOG_TAG, "new GCM Registration Token: " + token);
 
